@@ -11,8 +11,10 @@
 
 int main(int argc, char * argv[]) {
 
-    if (argc > 3)
+    if (argc  <3) {
         std::cerr << "need two args" <<std::endl;
+        return -1;
+    }
     int agent_id=1;
     const char * rulefile =argv[1];
     const char * output =argv[2];
@@ -26,8 +28,8 @@ int main(int argc, char * argv[]) {
     boost::property_tree::ptree commonConfig= pt.get_child("Conf");
     boost::property_tree::ptree rules= pt.get_child("Rules");
     BOOST_FOREACH ( boost::property_tree::ptree::value_type & vt, rules ) {
-        std::string agentName = vt.second.get<std::string>("AgentName");
-        boost::property_tree::ptree conds= pt.get_child("Cond");
+        std::string agentName = vt.second.get<std::string>("AgName");
+        boost::property_tree::ptree conds= vt.second.get_child("Conds");
         bool result =true;
         BOOST_FOREACH ( boost::property_tree::ptree::value_type & cond, conds) {
             std::string type = cond.second.get<std::string>("Type");

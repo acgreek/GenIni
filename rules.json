@@ -1,0 +1,15 @@
+{
+    "Conf" : {  },
+    "Rules" : {
+        "Rule" : {
+            "AgName" : "pix",
+            "Conds" : {
+                "Cond" : {
+                    "Type" :"file",
+                    "File" :"/etc/input"
+                }
+            },
+            "Conf" : {}
+        }
+    }
+}
