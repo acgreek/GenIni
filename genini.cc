@@ -3,11 +3,14 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <map>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
+
+typedef std::map <std::string, std::string> conf_t;
 
 int main(int argc, char * argv[]) {
 
@@ -26,6 +29,11 @@ int main(int argc, char * argv[]) {
     read_json(rulefile, pt);
     std::ofstream outputfile (output);
     boost::property_tree::ptree commonConfig= pt.get_child("Conf");
+    conf_t defaultConf;
+    BOOST_FOREACH ( boost::property_tree::ptree::value_type & conf, commonConfig) {
+        defaultConf[conf.first] = conf.second.data();
+    }
+
     boost::property_tree::ptree rules= pt.get_child("Rules");
     BOOST_FOREACH ( boost::property_tree::ptree::value_type & vt, rules ) {
         std::string agentName = vt.second.get<std::string>("AgName");
@@ -33,7 +41,7 @@ int main(int argc, char * argv[]) {
         bool result =true;
         BOOST_FOREACH ( boost::property_tree::ptree::value_type & cond, conds) {
             std::string type = cond.second.get<std::string>("Type");
-            if (type.compare("file")) {
+            if (0 == type.compare("file")) {
                 std::string file= cond.second.get<std::string>("File");
                 if ( !boost::filesystem::exists( file )  )
                 {
@@ -44,8 +52,15 @@ int main(int argc, char * argv[]) {
         }
         if (result) {
             std::string conf= vt.second.get<std::string>("Conf");
+            conf_t localConf = defaultConf;
+            BOOST_FOREACH ( boost::property_tree::ptree::value_type & conf, commonConfig) {
+                localConf[conf.first] = conf.second.data();
+            }
             agentsSection<<  "[" << agent_id  << "-" << agentName << "]" <<  std::endl;
-            agentsSection<<  "\t" << conf << std::endl<< std::endl;
+            BOOST_FOREACH ( conf_t::value_type val, localConf) {
+                agentsSection<<  "\t" << val.first << "="<< val.second <<  std::endl;
+            }
+            agentsSection<<  std::endl;
             processSection<< "\t" << agentName << "=agent -i " << agent_id << " -s " << agentName << std::endl;
         }
 

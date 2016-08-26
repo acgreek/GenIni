@@ -1,15 +1,35 @@
 {
-    "Conf" : {  },
+    "Conf" : {
+        "LogAge" : "10",
+        "Retension" : "foo",
+        "key1" : "bar "
+    },
     "Rules" : {
         "Rule" : {
             "AgName" : "pix",
             "Conds" : {
                 "Cond" : {
                     "Type" :"file",
-                    "File" :"/etc/input"
+                    "File" :"/etc/inputrc"
                 }
             },
-            "Conf" : {}
+            "Conf" : {
+                "key2" : "baz",
+                "Retension" : "bla"
+            }
+        },
+        "Rule" : {
+            "AgName" : "bluecoat",
+            "Conds" : {
+                "Cond" : {
+                    "Type" :"file",
+                    "File" :"/etc/filethatdoesntexist"
+                }
+            },
+            "Conf" : {
+                "key2" : "baz",
+                "Retension" : "bla"
+            }
         }
     }
 }
