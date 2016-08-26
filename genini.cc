@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <set>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -37,6 +38,7 @@ int main(int argc, char * argv[]) {
         std::cerr << "need two args" <<std::endl;
         return -1;
     }
+    std::set<std::string> existing_agents;
     int agent_id=1;
     const char * rulefile =argv[1];
     const char * output =argv[2];
@@ -56,6 +58,8 @@ int main(int argc, char * argv[]) {
     boost::property_tree::ptree rules= pt.get_child("Rules");
     BOOST_FOREACH ( boost::property_tree::ptree::value_type & vt, rules ) {
         std::string agentName = vt.second.get<std::string>("AgName");
+        if (0 != existing_agents.count(agentName ))
+            continue;
         boost::property_tree::ptree conds= vt.second.get_child("Conds");
         bool result =true;
         BOOST_FOREACH ( boost::property_tree::ptree::value_type & cond, conds) {
@@ -79,6 +83,7 @@ int main(int argc, char * argv[]) {
             }
         }
         if (result) {
+            existing_agents.insert(agentName);
             std::string conf= vt.second.get<std::string>("Conf");
             conf_t localConf = defaultConf;
             BOOST_FOREACH ( boost::property_tree::ptree::value_type & conf, commonConfig) {
