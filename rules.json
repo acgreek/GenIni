@@ -19,6 +19,20 @@
             }
         },
         "Rule" : {
+            "AgName" : "pix2",
+            "Conds" : {
+                "Cond" : {
+                    "Type" :"fnmatch",
+                    "Path" :"/etc",
+                    "Pattern" :"i*rc"
+                }
+            },
+            "Conf" : {
+                "key2" : "baz",
+                "Retension" : "bla"
+            }
+        },
+        "Rule" : {
             "AgName" : "bluecoat",
             "Conds" : {
                 "Cond" : {

@@ -9,11 +9,30 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
+#include <dirent.h>
+#include <fnmatch.h>
+
+
+static int findInPath(const char *path, const char *pattern)
+{
+    int found =0;
+    DIR *dirp=opendir(path);
+    struct dirent entry;
+    struct dirent *dp=&entry;
+    while((dp = readdir(dirp)))
+    {
+        if((fnmatch(pattern, dp->d_name,0)) == 0)
+        {
+            found++;
+        }
+    }
+    closedir(dirp);
+    return found;
+}
 
 typedef std::map <std::string, std::string> conf_t;
 
 int main(int argc, char * argv[]) {
-
     if (argc  <3) {
         std::cerr << "need two args" <<std::endl;
         return -1;
@@ -49,6 +68,15 @@ int main(int argc, char * argv[]) {
                        break;
                 }
             }
+            if (0 == type.compare("fnmatch")) {
+                std::string path= cond.second.get<std::string>("Path");
+                std::string pattern= cond.second.get<std::string>("Pattern");
+                if ( 0 == findInPath(path.c_str(), pattern.c_str()))
+                {
+                       result = false;
+                       break;
+                }
+            }
         }
         if (result) {
             std::string conf= vt.second.get<std::string>("Conf");
@@ -62,6 +90,7 @@ int main(int argc, char * argv[]) {
             }
             agentsSection<<  std::endl;
             processSection<< "\t" << agentName << "=agent -i " << agent_id << " -s " << agentName << std::endl;
+            agent_id++;
         }
 
     }
